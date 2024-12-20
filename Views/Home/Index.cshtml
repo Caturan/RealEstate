@@ -1,0 +1,109 @@
+﻿@model RealEstate.ViewModels.HomeViewModel
+
+@{
+    ViewData["Title"] = "Home";
+}
+
+<!-- Hero Section -->
+<div class="hero-section mb-5 p-5 text-center bg-light">
+    <h1 class="display-4">Find Your Dream Home</h1>
+    <p class="lead">Search through thousands of listings to find the perfect home for you.</p>
+
+    <!-- Search Form -->
+    <div class="search-box p-4 mt-4">
+        <form asp-action="Search" method="post" class="row g-3 justify-content-center">
+            <div class="col-md-3">
+                <input type="text" name="location" class="form-control" placeholder="City, State, or ZIP">
+            </div>
+            <div class="col-md-2">
+                <select name="propertyType" class="form-select">
+                    <option value="">Property Type</option>
+                    @foreach (var type in Enum.GetValues(typeof(RealEstate.Models.PropertyType)))
+                    {
+                        <option value="@type">@type</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <input type="number" name="minPrice" class="form-control" placeholder="Min Price">
+            </div>
+            <div class="col-md-2">
+                <input type="number" name="maxPrice" class="form-control" placeholder="Max Price">
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Search</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Statistics Section -->
+<div class="container mb-5">
+    <div class="row text-center">
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h3 class="card-title">@Model.TotalProperties</h3>
+                    <p class="card-text">Total Properties</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h3 class="card-title">@Model.PropertiesForSale</h3>
+                    <p class="card-text">Properties For Sale</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h3 class="card-title">@Model.RecentlyAdded</h3>
+                    <p class="card-text">Recently Added</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Featured Properties Section -->
+<div class="container mb-5">
+    <h2 class="text-center mb-4">Featured Properties</h2>
+    <div class="row">
+        @if (Model.FeaturedProperties != null && Model.FeaturedProperties.Any())
+        {
+            @foreach (var property in Model.FeaturedProperties)
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card property-card">
+                        <img src="@(string.IsNullOrEmpty(property.ImageUrl) ? "/images/default-property.jpg" : property.ImageUrl)"
+                             class="card-img-top" alt="@property.Title">
+                        <div class="card-body">
+                            <h5 class="card-title">@property.Title</h5>
+                            <h6 class="card-subtitle mb-2 text-primary">@property.Price.ToString("C0")</h6>
+                            <p class="card-text">
+                                <i class="fas fa-bed"></i> @property.Bedrooms BD |
+                                <i class="fas fa-bath"></i> @property.Bathrooms BA |
+                                <i class="fas fa-ruler-combined"></i> @property.SquareFootage sq ft
+                            </p>
+                            <p class="card-text">
+                                <small class="text-muted">
+                                    <i class="fas fa-map-marker-alt"></i> @property.City, @property.State
+                                </small>
+                            </p>
+                            <a asp-controller="Properties" asp-action="Details" asp-route-id="@property.Id"
+                               class="btn btn-primary w-100">View Details</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12 text-center">
+                <p>No properties available at the moment.</p>
+            </div>
+        }
+    </div>
+</div>
