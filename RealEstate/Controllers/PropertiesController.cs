@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using RealEstate.Data;
 using RealEstate.Models;
@@ -81,7 +80,7 @@ namespace RealEstate.Controllers
             }
             catch (Exception ex)
             {
-                // Log the error
+                // Log the error (consider using a logging framework)
                 TempData["Error"] = "An error occurred while searching for properties.";
                 return View(new List<Property>());
             }
@@ -134,6 +133,7 @@ namespace RealEstate.Controllers
             }
             catch (Exception ex)
             {
+                // Log the error (consider using a logging framework)
                 TempData["Error"] = "An error occurred while creating the property.";
             }
             return View(property);
@@ -160,37 +160,41 @@ namespace RealEstate.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Description,Price,Bedrooms,Bathrooms,SquareFootage,Address,City,State,ZipCode,Type,ListingDate,IsAvailable,ImageUrl")] Property property)
         {
+            // Check if the ID in the route matches the ID in the property object
             if (id != property.Id)
             {
-                return NotFound();
+                return NotFound(); // Return 404 if IDs do not match
             }
 
+            // Check if the model state is valid
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(property);
-                    await _context.SaveChangesAsync();
+                    _context.Update(property); // Update the property in the context
+                    await _context.SaveChangesAsync(); // Save changes to the database
                     TempData["Success"] = "Property updated successfully!";
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(Index)); // Redirect to the Index action
                 }
                 catch (DbUpdateConcurrencyException)
                 {
+                    // Handle concurrency issues
                     if (!PropertyExists(property.Id))
                     {
-                        return NotFound();
+                        return NotFound(); // Return 404 if the property no longer exists
                     }
                     else
                     {
-                        throw;
+                        throw; // Rethrow the exception if it's a different issue
                     }
                 }
                 catch (Exception ex)
                 {
+                    // Log the error (consider using a logging framework)
                     TempData["Error"] = "An error occurred while updating the property.";
                 }
             }
-            return View(property);
+            return View(property); // Return the view with the property if the model state is invalid
         }
 
         // GET: Properties/Delete/5
@@ -229,6 +233,7 @@ namespace RealEstate.Controllers
             }
             catch (Exception ex)
             {
+                // Log the error (consider using a logging framework)
                 TempData["Error"] = "An error occurred while deleting the property.";
                 return RedirectToAction(nameof(Index));
             }
